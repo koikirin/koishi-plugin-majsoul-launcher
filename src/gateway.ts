@@ -137,7 +137,7 @@ const cli = new CAC()
 
 cli.command('')
   .option('-c, --config [config]', 'Config file', { default:  path.resolve(process.cwd(), './data/majsoul/gatewayconfig.json') })
-  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: path.resolve(process.cwd(), './data/majsoul/liqi.json') })
+  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: './liqi.json' })
 
 const args = cli.parse()
 
@@ -229,7 +229,7 @@ if (cluster.isPrimary) {
     client_version_string: ""
   }
 
-  const root = pb.Root.fromJSON(require(args.options.descriptor))
+  const root = pb.Root.fromJSON(require('./liqi.json'))
   const wrapper = root.lookupType("Wrapper")
 
   let client = new MongoClient(config.database.uri)

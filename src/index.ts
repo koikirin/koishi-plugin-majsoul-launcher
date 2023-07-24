@@ -4,13 +4,14 @@ import type { Config as GatewayConfig } from './gateway'
 import { spawn, spawnSync } from 'child_process'
 import { resolve } from 'path'
 import strip from 'strip-ansi'
-import { writeFile } from 'fs/promises'
+import { mkdir, writeFile } from 'fs/promises'
 
 export class Majsoul {
   static filter = false
 
   constructor(public ctx: Context, config: Majsoul.Config) {
     ctx.on('ready', async () => {
+      await mkdir(resolve(this.ctx.baseDir, 'data/majsoul/'), { recursive: true })
       await writeFile(resolve(ctx.baseDir, 'data/majsoul/gatewayconfig.json'), JSON.stringify(config.gateway))
       await writeFile(resolve(ctx.baseDir, 'data/majsoul/obconfig.json'), JSON.stringify(config.ob))
       try {
@@ -35,8 +36,8 @@ export class Majsoul {
     const handleData = async (data: any) => {
       data = strip(data.toString()).trim()
       if (!data) return
-      for (const line of data.trim().split('\n')) {
-        logger.info(line.trim())
+      for (const line of data.split('\n')) {
+        logger.info(line)
       }
     }
 

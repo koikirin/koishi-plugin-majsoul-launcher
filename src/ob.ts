@@ -25,7 +25,7 @@ const cli = new CAC()
 
 cli.command('')
   .option('-c, --config [config]', 'Config file', { default:  path.resolve(process.cwd(), './data/majsoul/obconfig.json') })
-  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: path.resolve(process.cwd(), './data/majsoul/liqi.json') })
+  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: './liqi.json' })
 
 const args = cli.parse()
 
