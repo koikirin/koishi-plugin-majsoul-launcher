@@ -4,7 +4,6 @@ import { WebSocketServer, WebSocket } from 'ws'
 import url from 'url'
 import process from 'process'
 import { HttpsProxyAgent } from 'https-proxy-agent'
-import { CAC } from 'cac'
 import pb from 'protobufjs'
 
 type WebSocketEx = WebSocket & {
@@ -21,15 +20,7 @@ export interface Config {
   proxy?: string
 }
 
-const cli = new CAC()
-
-cli.command('')
-  .option('-c, --config [config]', 'Config file', { default:  path.resolve(process.cwd(), './data/majsoul/obconfig.json') })
-  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: './liqi.json' })
-
-const args = cli.parse()
-
-let config: Config = require(args.options.config)
+let config: Config = require(path.resolve(process.cwd(), './data/majsoul/obconfig.json'))
 
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`)
@@ -45,7 +36,7 @@ if (cluster.isPrimary) {
 
 } else {
 
-  const root = pb.Root.fromJSON(require(args.options.descriptor))
+  const root = pb.Root.fromJSON(require('./liqi.json'))
   const wrapper = root.lookupType("Wrapper")
 
   const wss = new WebSocketServer({ port: config.port, host: config.host })

@@ -7,7 +7,6 @@ import process from 'process'
 import MJSoul from 'mjsoul'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import crypto from 'crypto'
-import { CAC } from 'cac'
 import pb from 'protobufjs'
 
 declare module 'mjsoul' {
@@ -133,15 +132,7 @@ interface WorkerState {
   timeout_retries_max: number,
 }
 
-const cli = new CAC()
-
-cli.command('')
-  .option('-c, --config [config]', 'Config file', { default:  path.resolve(process.cwd(), './data/majsoul/gatewayconfig.json') })
-  .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: './liqi.json' })
-
-const args = cli.parse()
-
-let config: Config = require(args.options.config)
+let config: Config = require(path.resolve(process.cwd(), './data/majsoul/gatewayconfig.json'))
 
 if (cluster.isPrimary) {
   let state: PrimaryState = {
