@@ -1,6 +1,6 @@
-# @hieuzest/koishi-plugin-majsoul
+# @hieuzest/koishi-plugin-majsoul-launcher
 
-[![npm](https://img.shields.io/npm/v/@hieuzest/koishi-plugin-majsoul-launcher?style=flat-square)](https://www.npmjs.com/package/@hieuzest/koishi-plugin-majsoul)
+[![npm](https://img.shields.io/npm/v/@hieuzest/koishi-plugin-majsoul-launcher?style=flat-square)](https://www.npmjs.com/package/@hieuzest/koishi-plugin-majsoul-launcher)
 
 The backend of @hieuzest/mahjong, majsoul observation server
 
