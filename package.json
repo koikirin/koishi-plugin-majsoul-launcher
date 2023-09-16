@@ -1,7 +1,7 @@
 {
   "name": "@hieuzest/koishi-plugin-majsoul-launcher",
   "description": "",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -22,11 +22,13 @@
     "https-proxy-agent": "^5.0.1"
   },
   "devDependencies": {
+    "koishi": "^4.14.5",
     "@types/ws": "^8.5.5",
     "ws": "^8.14.1",
     "axios": "^1.5.0",
     "https-proxy-agent": "^5.0.1",
-    "cac": "^6.7.14"
+    "cac": "^6.7.14",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "cluster": "^0.7.7",
