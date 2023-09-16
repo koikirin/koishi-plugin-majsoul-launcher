@@ -1,7 +1,7 @@
 {
   "name": "@hieuzest/koishi-plugin-majsoul-launcher",
   "description": "",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -16,18 +16,21 @@
     "plugin"
   ],
   "peerDependencies": {
-    "koishi": "^4.13.8",
-    "@types/ws": "^8.5.5",
-    "ws": "^8.13.0",
-    "axios": "^1.4.0",
+    "koishi": "^4.14.5",
+    "ws": "^8.14.1",
+    "axios": "^1.5.0",
     "https-proxy-agent": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.5",
+    "ws": "^8.14.1",
+    "axios": "^1.5.0",
+    "https-proxy-agent": "^5.0.1",
+    "cac": "^6.7.14"
   },
   "dependencies": {
     "cluster": "^0.7.7",
     "mjsoul": "^2.3.0",
-    "mongodb": "^5.7.0"
-  },
-  "koishi": {
-    "hidden": true
+    "mongodb": "^5.8.1"
   }
 }

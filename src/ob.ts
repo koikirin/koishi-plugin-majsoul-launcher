@@ -1,14 +1,15 @@
 import cluster from 'cluster'
 import path from 'path'
-import { WebSocketServer, WebSocket } from 'ws'
+import { WebSocket, WebSocketServer } from 'ws'
 import url from 'url'
 import process from 'process'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import pb from 'protobufjs'
+import { CAC } from 'cac'
 
 type WebSocketEx = WebSocket & {
   token: string
-  tag: string,
+  tag: string
   obws: WebSocket
 }
 
@@ -20,7 +21,25 @@ export interface Config {
   proxy?: string
 }
 
-let config: Config = require(path.resolve(process.cwd(), './data/majsoul/obconfig.json'))
+let $options: {
+  config: string
+  descriptor: string
+}
+
+try {
+  const cli: CAC = require('cac')()
+  cli.command('')
+    .option('-c, --config [config]', 'Config file', { default: path.resolve(process.cwd(), './data/majsoul/obconfig.json') })
+    .option('-d, --descriptor [descriptor]', 'ProtobufJS descriptor', { default: './liqi.json' })
+  $options = cli.parse().options as any
+} catch {
+  $options = {
+    config: path.resolve(process.cwd(), './data/majsoul/obconfig.json'),
+    descriptor: './liqi.json',
+  }
+}
+
+const config: Config = require($options.config)
 
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`)
@@ -33,15 +52,13 @@ if (cluster.isPrimary) {
     console.log(`worker [${worker.id}:${worker.process.pid}] died`)
     setTimeout(() => cluster.fork(), 30000)
   })
-
 } else {
-
-  const root = pb.Root.fromJSON(require('./liqi.json'))
-  const wrapper = root.lookupType("Wrapper")
+  const root = pb.Root.fromJSON(require($options.descriptor))
+  const wrapper = root.lookupType('Wrapper')
 
   const wss = new WebSocketServer({ port: config.port, host: config.host })
 
-  function get_match_description(raw: any) {
+  function getMatchDescription(raw: any) {
     const data = JSON.parse(raw)
     if (data.error) throw data
     const head = JSON.parse(data.head)
@@ -52,20 +69,20 @@ if (cluster.isPrimary) {
     return ret
   }
 
-  let state = {
-    server_index: 0
+  const state = {
+    server_index: 0,
   }
 
-  function get_ob_server_address() {
+  function getObServerAddress() {
     state.server_index = (state.server_index + 1) % config.servers.length
     return config.servers[state.server_index]
   }
 
   wss.on('connection', function connection(ws: WebSocketEx, req) {
-    const parameters = url.parse(req.url, true)
-    ws.token = parameters.query.token as string
-    ws.tag = parameters.query.tag as string || ""
-    ws.obws = new WebSocket(get_ob_server_address(), config.proxy ? { agent: new HttpsProxyAgent(config.proxy) } : undefined)
+    const parameters = new url.URL(req.url)
+    ws.token = parameters.searchParams.get('token')
+    ws.tag = parameters.searchParams.get('tag') || ''
+    ws.obws = new WebSocket(getObServerAddress(), config.proxy ? { agent: new HttpsProxyAgent(config.proxy) } : undefined)
     console.log(`[${cluster.worker.id}][${ws.tag}] Receive OB Request ${ws.token} using ${state.server_index}`)
     ws.obws.on('open', function open() {
       const req1 = `<= Auth 1 {"token":"${ws.token}"}`
@@ -86,15 +103,16 @@ if (cluster.isPrimary) {
     ws.obws.on('message', function message(data: Buffer) {
       // console.log(data.subarray(0, 1).toString())
       try {
-        if (data.subarray(0, 2).toString() == '=>') {
-          if (data.subarray(0, 5).toString() == '=> 1 ')
-            console.log(`[${cluster.worker.id}][${ws.tag}] Fetched:`, get_match_description(data.subarray(5)))
-          else
+        if (data.subarray(0, 2).toString() === '=>') {
+          if (data.subarray(0, 5).toString() === '=> 1 ') {
+            console.log(`[${cluster.worker.id}][${ws.tag}] Fetched:`, getMatchDescription(data.subarray(5)))
+          } else {
             console.log(`[${cluster.worker.id}][${ws.tag}]`, data.toString().slice(0, 100))
+          }
           ws.send(JSON.stringify({
-            name: "ob_init",
+            name: 'ob_init',
             seq: 0,
-            data: data.slice(5).toString()
+            data: data.slice(5).toString(),
           }))
           return
         }
@@ -111,14 +129,14 @@ if (cluster.isPrimary) {
         decodeData.data = root.lookupType(decodeData.name).decode(decodeData.data)
         ws.send(JSON.stringify({
           name: decodeData.name,
-          seq: seq,
-          data: decodeData.data.toJSON()
+          seq,
+          data: decodeData.data.toJSON(),
         }))
       } catch (e) {
         console.log(`[${cluster.worker.id}][${ws.tag}] What hell`, e, data.toString())
         return
       }
-      if (decodeData.name == '.lq.GameEndAction') {
+      if (decodeData.name === '.lq.GameEndAction') {
         ws.obws.close()
         setTimeout(() => {
           ws.close(4003)

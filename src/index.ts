@@ -1,7 +1,7 @@
-import { Context, Logger, Schema, Service } from 'koishi'
+import { Context, Logger, Schema } from 'koishi'
 import type { Config as OBConfig } from './ob'
 import type { Config as GatewayConfig } from './gateway'
-import { spawn, spawnSync } from 'child_process'
+import { spawn } from 'child_process'
 import { resolve } from 'path'
 import strip from 'strip-ansi'
 import { mkdir, writeFile } from 'fs/promises'
@@ -30,7 +30,7 @@ export class Majsoul {
       env: {
         FORCE_TTY: '1',
         ...process.env,
-      }
+      },
     })
 
     const handleData = async (data: any) => {
@@ -64,7 +64,7 @@ export namespace Majsoul {
     num_workers: Schema.number().default(1),
     host: Schema.string().default('127.0.0.1'),
     port: Schema.number().default(7237),
-    proxy: Schema.string()
+    proxy: Schema.string(),
   })
 
   export const GatewayConfig: Schema<GatewayConfig> = Schema.object({
@@ -84,17 +84,17 @@ export namespace Majsoul {
         Schema.object({
           type: Schema.const(10).required(),
           access_token: Schema.string(),
-        })
-      ])
+        }),
+      ]),
     ])),
     database: Schema.object({
-      uri: Schema.string().default('mongodb://127.0.0.1:27017/majob')
+      uri: Schema.string().default('mongodb://127.0.0.1:27017/majob'),
     }),
     num_workers: Schema.number().default(2),
     timeout: Schema.number().default(5000),
     host: Schema.string().default('127.0.0.1'),
     port: Schema.number().default(7236),
-    proxy: Schema.string()
+    proxy: Schema.string(),
   })
 
   export interface Config {
